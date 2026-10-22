@@ -5,15 +5,17 @@ export default async function handler(req, res) {
   const API_KEY = "x4Z4jmz39lUBrHMORlwQ4TF5ReEaX0VPdj6qUQYN0RhBPhUW5Q9bXVbgcaRvOYWc";
 
   try {
-    const response = await fetch(`https://disqus.com/api/3.0/posts/list.json?api_key=${API_KEY}&forum=${FORUM_NAME}&limit=1&order=desc`);
+    // Usamos el endpoint de hilos y posts recientes del foro
+    const response = await fetch(`https://disqus.com/api/3.0/forums/listPosts.json?api_key=${API_KEY}&forum=${FORUM_NAME}&limit=5&related=thread`);
     const data = await response.json();
 
     if (data.code === 0 && data.response && data.response.length > 0) {
+      // Tomamos el último comentario publicado
       const comment = data.response[0];
 
       const usuario = comment.author ? comment.author.name : "Anónimo";
       const mensajeTexto = comment.raw_message || "Sin texto";
-      const urlEntrada = comment.threadUrl || "https://www.animev1.net";
+      const urlEntrada = comment.thread && comment.thread.link ? comment.thread.link : "https://www.animev1.net";
 
       const mensajeTelegram = `💬 <b>¡Nuevo comentario en AnimeV1!</b>\n\n` +
                               `👤 <b>Usuario:</b> ${usuario}\n` +
@@ -30,7 +32,7 @@ export default async function handler(req, res) {
         })
       });
 
-      return res.status(200).json({ status: "Notificación enviada", commentId: comment.id });
+      return res.status(200).json({ status: "Notificación enviada", commentId: comment.id, author: usuario });
     }
 
     return res.status(200).json({ status: "Sin comentarios encontrados" });
