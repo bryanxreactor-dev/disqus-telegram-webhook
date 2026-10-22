@@ -3,14 +3,13 @@ export default async function handler(req, res) {
   const TELEGRAM_CHAT_ID = "-1004437242993";
   const FORUM_NAME = "animev1-net";
   const API_KEY = "x4Z4jmz39lUBrHMORlwQ4TF5ReEaX0VPdj6qUQYN0RhBPhUW5Q9bXVbgcaRvOYWc";
+  const ACCESS_TOKEN = "f3e5313a6032410dba954888ce547a4c";
 
   try {
-    // Usamos el endpoint de hilos y posts recientes del foro
-    const response = await fetch(`https://disqus.com/api/3.0/forums/listPosts.json?api_key=${API_KEY}&forum=${FORUM_NAME}&limit=5&related=thread`);
+    const response = await fetch(`https://disqus.com/api/3.0/forums/listPosts.json?api_key=${API_KEY}&access_token=${ACCESS_TOKEN}&forum=${FORUM_NAME}&limit=5&related=thread`);
     const data = await response.json();
 
     if (data.code === 0 && data.response && data.response.length > 0) {
-      // Tomamos el último comentario publicado
       const comment = data.response[0];
 
       const usuario = comment.author ? comment.author.name : "Anónimo";
